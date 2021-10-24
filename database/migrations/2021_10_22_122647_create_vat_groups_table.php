@@ -14,7 +14,10 @@ class CreateVatGroupsTable extends Migration
     public function up()
     {
         Schema::create('vat_groups', function (Blueprint $table) {
-            $table->id();
+            $table->id('idvatgroup');
+            $table->string('name');
+            $table->float('percentage')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
