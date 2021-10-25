@@ -26,6 +26,31 @@
                     <td>-</td>
                 @endif
             @endforeach
+
+    @php
+     $count =1;
+     @endphp
+    <tr><td colspan="{{count($fields)}}"><b>PRODUCTS</b></td>
+             @foreach($order->order_products as $op)
+                 <tr><td colspan="{{count($fields)}}">
+                         <table border="1" cellspacing="0" cellpadding="0">
+                             <tr>
+                                 <td>{{$count}} -</td>
+                                 @foreach($fields_op as  $f)
+                                 <td width="100">{{$op[$f]}}</td>
+                                     @endforeach
+
+                             </tr>
+
+                         </table>
+
+
+                     </td></tr>
+        @php
+            $count++;
+        @endphp
+                @endforeach
+
         </tr>
     @endforeach
 

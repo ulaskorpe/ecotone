@@ -49,6 +49,6 @@ class Order extends Model
     ];
 
     public function order_products(){
-        return $this->hasMany(OrderProduct::class,'idproduct','idproduct');
+        return $this->hasMany(OrderProduct::class,'idorder','idorder');
     }
 }

@@ -12,22 +12,51 @@ class OrderController extends Controller
     public function getOrders (){
 
 
-        $user= new OrderProduct();
+        $fields  = [
+            "idorder",
+            "idcustomer",
+            "idtemplate",
+            "idshippingprovider_profile",
+            "orderid",
+            "deliveryname",
+            "deliverycontactname",
+            "deliveryaddress",
+            "deliveryaddress2",
+            "deliveryzipcode",
+            "deliverycity",
+            "deliveryregion",
+            "deliverycountry",
+            "full_delivery_address",
+            "invoicename",
+            "invoicecontactname",
+            "invoiceaddress",
+            "invoiceaddress2",
+            "invoicezipcode",
+            "invoicecity",
+            "invoiceregion",
+            "invoicecountry",
+            "full_invoice_address",
+            "telephone",
+            "emailaddress",
+            "reference",
+            "customer_remarks",
+            "partialdelivery",
+            "discount",
+            "invoiced",
+            "status",
+            "idfulfilment_customer",
+            "preferred_delivery_date",
+            "language"
 
-        $table = $user->getTable();
-
-        $fields  = \Schema::getColumnListing($table);
-
-        foreach ($fields as $field){
-            echo "'".$field."',"."<br>";
-        }
-
-        die();
-        $user= new Order();
-
-        $table = $user->getTable();
-
-        $fields  = \Schema::getColumnListing($table);
+        ];
+        $fields_op  = [ 'idorder_product',
+            'idproduct',
+            'amount',
+            'productcode',
+            'name',
+            'remarks',
+            'price',
+            'idvatgroup',];
 
 
 
@@ -42,31 +71,39 @@ class OrderController extends Controller
         $orders= $apiClient->getOrders()['data'];
 
 
-
-
-//
-        //       return $warehouses;
         Order::truncate();
+        OrderProduct::truncate();
 
 
-        foreach ($orders as $warehouse){
+        foreach ($orders as $order){
 
 
-            $newWarehouse = new WareHouse();
+
+            $newOrder = new Order();
             foreach ($fields as $field){
-                if(!empty($warehouse[$field])){
-                    $newWarehouse->$field= $warehouse[$field];
+                if(!empty($order[$field])){
+                    $newOrder->$field= $order[$field];
                 }
             }
-            $newWarehouse->save();
-            //  $stocks = $apiClient->getProductStock($newProduct['idproduct']);
+            $newOrder->save();
+
+            foreach ($order['products'] as $orderProduct) {
+                $op = new OrderProduct();
+                $op->idorder = $newOrder['idorder'];
+                foreach ($fields_op as $f){
+                    $op->$f = $orderProduct[$f];
+                }
+                //var_dump($orderProduct);
+                $op->save();
+            }
 
 
 
         }
+///return $fields;
 
 
-        return view('warehouses_list',['warehouses'=>WareHouse::all(),'fields'=>$fields]);
+        return view('orders_list',['orders'=>Order::with('order_products')->get(),'fields'=>$fields,'fields_op'=>$fields_op]);
 
 
     }

@@ -15,8 +15,8 @@
     @foreach($products as $product)
 <tr>
     <td>
-        <button>UPDATE</button>
-        <button>DELETE</button>
+        <button onclick="updateProduct({{$product['idproduct']}})">UPDATE</button>
+        <button onclick="deleteProduct({{$product['idproduct']}})">DELETE</button>
     </td>
 
     @foreach($fields as $field)
@@ -30,3 +30,6 @@
         @endforeach
 
 </table>
+
+
+

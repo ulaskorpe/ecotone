@@ -12,7 +12,7 @@ class OrderProduct extends Model
     use SoftDeletes;
     protected $table = 'order_products';
     protected $fillable = [
-        'id',
+        'idorder_product',
         'idorder',
         'idproduct',
         'amount',
@@ -21,9 +21,7 @@ class OrderProduct extends Model
         'remarks',
         'price',
         'idvatgroup',
-        'deleted_at',
-        'created_at',
-        'updated_at',
+
 
     ];
 

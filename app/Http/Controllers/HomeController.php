@@ -15,15 +15,10 @@ class HomeController extends Controller
 
 
 
-   public function index(){
+   public function index($view=null){
 
 
-
-
-
-   //var_dump($orders);
-
-       return view('index',[]);
+       return view('index',['view'=>$view]);
 
       // print_r(array_keys($orders));
   //     var_dump($orders['data'][0]);

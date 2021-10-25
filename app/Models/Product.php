@@ -11,6 +11,7 @@ class Product extends Model
     use HasFactory;
     use SoftDeletes;
     protected $table = 'products';
+    protected $primaryKey = 'idproduct';
     protected $fillable = ['idproduct',
         'idvatgroup','name','price','fixedstockprice','idsupplier','productcode'
         ,'productcode_supplier'

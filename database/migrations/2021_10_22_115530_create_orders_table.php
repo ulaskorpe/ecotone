@@ -18,7 +18,7 @@ class CreateOrdersTable extends Migration
             $table->integer('idcustomer')->default(0);
             $table->integer('idtemplate')->default(0);
             $table->integer('idshippingprovider_profile')->default(0);
-            $table->integer('orderid')->default(0);
+            $table->string('orderid')->nullable()->default(null);;
              $table->string('deliveryname')->nullable()->default(null);
              $table->string('deliverycontactname')->nullable()->default(null);
              $table->string('deliveryaddress')->nullable()->default(null);
@@ -46,8 +46,9 @@ class CreateOrdersTable extends Migration
              $table->boolean('invoiced')->default(0);
             $table->string('status')->nullable()->default(null);
             $table->integer('idfulfilment_customer')->default(0);
-            $table->date('preferred_delivery_date')->default(null);
+            $table->date('preferred_delivery_date')->nullable()->default(null);
             $table->string('language')->nullable()->default(null);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

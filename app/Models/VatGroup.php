@@ -11,6 +11,6 @@ class VatGroup extends Model
     use HasFactory;
     use SoftDeletes;
     protected $table = 'vat_groups';
-    protected $fillable = ['name','percentage'];
+    protected $fillable = ['idvatgroup','name','percentage'];
 
 }
