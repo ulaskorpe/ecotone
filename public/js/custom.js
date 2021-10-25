@@ -70,8 +70,32 @@ function updateProduct(idproduct){
     });
 }
 
+function listStocks(idproduct){
 
+    $.get( "/products/list-stocks/"+idproduct, function( data ) {
 
+        $( "#result" ).html( data );
+        //alert( "Load was performed." );
+    });
+}
+
+function createStock(idproduct){
+
+    $.get( "/products/create-stock/"+idproduct, function( data ) {
+
+        $( "#result" ).html( data );
+        //alert( "Load was performed." );
+    });
+}
+
+function updateStock(idstock){
+
+    $.get( "/products/update-stock/"+idstock, function( data ) {
+
+        $( "#result" ).html( data );
+        //alert( "Load was performed." );
+    });
+}
 
 function deleteProduct(product_id){
     swal("Product will be deleted, are you sure?", {
@@ -81,6 +105,30 @@ function deleteProduct(product_id){
         if (value) {
             //   console.log("{{url('orders/delete-order')}}/" + img_id);
             $.get("/products/delete-product/" + product_id, function (data) {
+                swal("" + data);
+                setTimeout(function () {
+                    window.open('/listproducts', '_self');
+
+                }, 2000);
+
+                //   console.log(user_id+":"+follower_id);
+
+
+            });
+
+
+        }
+    })
+}
+
+function deleteStock(idstock){
+    swal("Stock will be deleted, are you sure?", {
+        buttons: ["Cancel", "YES"],
+        dangerMode: true,
+    }).then((value) => {
+        if (value) {
+            //   console.log("{{url('orders/delete-order')}}/" + img_id);
+            $.get("/products/delete-stock/" + idstock, function (data) {
                 swal("" + data);
                 setTimeout(function () {
                     window.open('/listproducts', '_self');

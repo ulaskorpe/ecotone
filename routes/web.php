@@ -23,9 +23,14 @@ Route::group(['prefix'=>'products'],function(){
     Route::post('/update-product-post',[\App\Http\Controllers\ProductController::class,'updateProductPost'])->name('update-product-post');
     Route::get('/get-products',[\App\Http\Controllers\ProductController::class,'getProducts'])->name('get-products');
     Route::get('/list-products',[\App\Http\Controllers\ProductController::class,'products'])->name('product-list');
+    Route::get('/list-stocks/{idproduct}',[\App\Http\Controllers\ProductController::class,'listStocks'])->name('stocks-list');
     Route::get('/delete-product/{idproduct}',[\App\Http\Controllers\ProductController::class,'deleteProduct'])->name('product-delete');
 
-
+    Route::get('/delete-stock/{id}',[\App\Http\Controllers\ProductController::class,'deleteStock'])->name('stock-delete');
+    Route::get('/create-stock/{idproduct}',[\App\Http\Controllers\ProductController::class,'createStock'])->name('create-stock');
+    Route::post('/create-stock-post',[\App\Http\Controllers\ProductController::class,'createStockPost'])->name('create-stock-post');
+    Route::get('/update-stock/{id}',[\App\Http\Controllers\ProductController::class,'updateStock'])->name('update-stock');
+    Route::post('/update-stock-post',[\App\Http\Controllers\ProductController::class,'updateStockPost'])->name('update-stock-post');
 });
 
 Route::group(['prefix'=>'warehouses'],function(){

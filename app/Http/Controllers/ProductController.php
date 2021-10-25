@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Location;
+use App\Models\LocationType;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\Supplier;
 use App\Models\VatGroup;
+use App\Models\WareHouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Picqer\Api\Client;
@@ -74,7 +77,7 @@ class ProductController extends Controller
 
 
 
-      //return  $products;
+
 
          $fields = ['idproduct',
             'idvatgroup','name','price','fixedstockprice','idsupplier','productcode'
@@ -109,25 +112,57 @@ class ProductController extends Controller
                 }
             }
             $newProduct->save();
-          //  $stocks = $apiClient->getProductStock($newProduct['idproduct']);
+
 
             if(!empty($product['stock'])){
-                $stock = new Stock();
-                $stock->idproduct =$newProduct['idproduct'];
-                $stock->idwarehouse =$product['stock'][0]['idwarehouse'];
-                $stock->stock =$product['stock'][0]['stock'];
-                $stock->reserved =$product['stock'][0]['reserved'];
-                $stock->reservedbackorders =$product['stock'][0]['reservedbackorders'];
-                $stock->reservedpicklists =$product['stock'][0]['reservedpicklists'];
-                $stock->reservedallocations =$product['stock'][0]['reservedallocations'];
-                $stock->freestock =$product['stock'][0]['freestock'];
-                $stock->save();
+           // echo $newProduct['idproduct']."<br>";
+                foreach ($product['stock'] as $item){
+                    $stock = new Stock();
+                    $stock->idproduct =$newProduct['idproduct'];
+                    $stock->idwarehouse =$item['idwarehouse'];
+                    $stock->stock =$item['stock'];
+                    $stock->reserved =$item['reserved'];
+                    $stock->reservedbackorders =$item['reservedbackorders'];
+                    $stock->reservedpicklists =$item['reservedpicklists'];
+                    $stock->reservedallocations =$item['reservedallocations'];
+                    $stock->freestock =$item['freestock'];
+                    $stock->save();
+                }
+
 //var_dump($product['stock'][0]['idwarehouse'] );
-//echo "<hr>";
+
             }
 
-        }
+        }///foreach products
 
+        $locations =  $apiClient->getLocations()['data'];
+        Location::truncate();
+        LocationType::truncate();
+        foreach ($locations as $location){
+
+            $lo=new Location();
+            $lo->idlocation = $location['idlocation'];
+            $lo->idwarehouse = $location['idwarehouse'];
+            $lo->name = $location['name'];
+            $lo->parent_idlocation = (!empty($location['parent_idlocation'])) ? $location['parent_idlocation'] :0 ;
+
+            $lt = LocationType::find($location['location_type']['idlocation_type']);
+            if(empty($lt['idlocation_type'])){
+                $lt = new LocationType();
+                $lt->idlocation_type = $location['location_type']['idlocation_type'];
+                $lt->name = $location['location_type']['name'];
+                $lt->default = $location['location_type']['default'];
+                $lt->color = $location['location_type']['color'];
+                $lt->save();
+
+            }
+            // $lo->idlocation_type=$lt['idlocation_type'];
+            $lo->idlocation_type=$location['location_type']['idlocation_type'];
+            $lo->save();
+
+
+
+        }
 
 return view('product_list',['products'=>Product::all(),'fields'=>$fields]);
 
@@ -241,10 +276,13 @@ return view('product_list',['products'=>Product::all(),'fields'=>$fields]);
                 // ,'unlimitedstock'
                 $product->save();
 
+
+
                   $apiClient = new Client('fairweb','I2Tc124Kp0qBvI0glLMUi6souHsMimyh8C2fOk8hk59Rf3qg');
                   $apiClient->enableRetryOnRateLimitHit();
                   $apiClient->setUseragent('ECOTONE');
                    $apiClient->addProduct($product);
+                //$apiClient->deletepr
             });
             return redirect('/listproducts');
         }
@@ -309,6 +347,94 @@ return view('product_list',['products'=>Product::all(),'fields'=>$fields]);
     public function deleteProduct($idproduct){
         Product::where('idproduct','=',$idproduct)->delete();
         return "Product Deleted";
+    }
+    public function deleteStock($idstock){
+        Stock::where('idproduct_stock_history','=',$idstock)->delete();
+        return "Stock Deleted";
+    }
+
+    public function listStocks($idproduct){
+
+        return view('product_stocks',['stocks'=>Stock::where('idproduct','=',$idproduct)->orderBy('created_at','DESC')->get(),
+            'product'=>Product::find($idproduct)
+
+            ]);
+    }
+
+    public function createStock($idproduct){
+
+        $apiClient = new Client('fairweb','I2Tc124Kp0qBvI0glLMUi6souHsMimyh8C2fOk8hk59Rf3qg');
+        $apiClient->enableRetryOnRateLimitHit();
+        $apiClient->setUseragent('ECOTONE');
+
+
+         return view('create_stock',['idproduct'=>$idproduct,'warehouses'=>WareHouse::all(),'product'=>Product::find($idproduct)
+
+
+         ]);
+
+
+    }
+
+    public function updateStock($idproduct_stock_history){
+
+
+    $stock = Stock::find($idproduct_stock_history);
+
+         return view('update_stock',['idproduct'=>$stock['idproduct'],'warehouses'=>WareHouse::all(),
+             'stock'=>$stock,
+             'product'=>Product::find($stock['idproduct'])
+
+
+         ]);
+
+
+    }
+
+    public function createStockPost(Request $request){
+
+
+        $stock=new Stock();
+        $stock->idproduct=$request['idproduct'];
+        $stock->idwarehouse=$request['idwarehouse'];
+        $stock->stock=$request['stock'];
+        $stock->reserved=$request['reserved'];
+        $stock->reservedbackorders=$request['reservedbackorders'];
+        $stock->reservedpicklists=$request['reservedpicklists'];
+        $stock->reservedallocations=$request['reservedallocations'];
+        $stock->freestock=$request['freestock'];
+        $stock->save();
+
+     $product = Product::with('stocks')->find($request['idproduct']);
+        $apiClient = new Client('fairweb','I2Tc124Kp0qBvI0glLMUi6souHsMimyh8C2fOk8hk59Rf3qg');
+        $apiClient->enableRetryOnRateLimitHit();
+        $apiClient->setUseragent('ECOTONE');
+       // $apiClient->addProduct($product);
+        ///$apiClient->
+        return redirect('/listproducts');
+    }
+
+    public function updateStockPost(Request $request){
+
+
+        $stock=Stock::find($request['idproduct_stock_history']);
+        //$stock->idproduct=$request['idproduct'];
+        $stock->idwarehouse=$request['idwarehouse'];
+        $stock->stock=$request['stock'];
+        $stock->reserved=$request['reserved'];
+        $stock->reservedbackorders=$request['reservedbackorders'];
+        $stock->reservedpicklists=$request['reservedpicklists'];
+        $stock->reservedallocations=$request['reservedallocations'];
+        $stock->freestock=$request['freestock'];
+        $stock->save();
+
+     $product = Product::with('stocks')->find($request['idproduct']);
+        $apiClient = new Client('fairweb','I2Tc124Kp0qBvI0glLMUi6souHsMimyh8C2fOk8hk59Rf3qg');
+        $apiClient->enableRetryOnRateLimitHit();
+        $apiClient->setUseragent('ECOTONE');
+       // $apiClient->addProduct($product);
+        ///$apiClient->
+        return redirect('/listproducts');
     }
 
 }

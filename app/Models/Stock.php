@@ -11,6 +11,7 @@ class Stock extends Model
     use HasFactory;
     use SoftDeletes;
     protected $table = 'stocks';
+    protected $primaryKey ='idproduct_stock_history';
     protected $fillable = [
         'idproduct_stock_history',
         'idproduct',
@@ -33,5 +34,9 @@ class Stock extends Model
 
     public function product(){
         return $this->hasOne(Product::class,'idproduct','idproduct');
+    }
+
+    public function warehouse(){
+        return $this->hasOne(WareHouse::class,'idwarehouse','idwarehouse');
     }
 }

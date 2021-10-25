@@ -17,6 +17,7 @@
     <td>
         <button onclick="updateProduct({{$product['idproduct']}})">UPDATE</button>
         <button onclick="deleteProduct({{$product['idproduct']}})">DELETE</button>
+        <button onclick="listStocks({{$product['idproduct']}})">STOCKS</button>
     </td>
 
     @foreach($fields as $field)
